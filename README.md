@@ -1,34 +1,47 @@
-# TechFlow Solutions - Sistema de Gerenciamento de Tarefas Logísticas
+# WorkFlow Manager
 
-## Sobre o Projeto
-Este projeto consiste em um sistema dinâmico de gerenciamento de tarefas desenvolvido sob medida para uma startup de logística. O objetivo principal é permitir o acompanhamento do fluxo de trabalho operacional em tempo real, auxiliando na priorização de entregas críticas, despacho de cargas e monitoramento da eficiência das equipes de distribuição.
+O **WorkFlow Manager** é um sistema de gerenciamento de fluxo de trabalho baseado em um quadro Kanban, desenvolvido para otimizar o acompanhamento de demandas e rotas em operações de logística.
 
-O sistema conta com uma arquitetura backend robusta e uma interface gráfica amigável para facilitar o uso no dia a dia operacional.
+Este projeto foi construído utilizando a arquitetura em camadas do ecossistema Spring Boot, integrando persistência em banco de dados relacional, automação de testes e uma esteira de integração contínua.
 
----
+## Tecnologias Utilizadas
 
-## Escopo Inicial do Sistema
-A versão inicial da aplicação contempla as seguintes funcionalidades essenciais (CRUD):
-* **Cadastro de Tarefas Logísticas:** Registro de novas demandas com título, descrição, nível de prioridade e status.
-* **Listagem em Tempo Real:** Visualização centralizada de todas as operações pendentes e em execução.
-* **Atualização de Status:** Permite atualizar a fase de uma tarefa à medida que a entrega avança.
-* **Exclusão de Registros:** Remoção de tarefas canceladas ou concluídas do painel ativo.
+* **Java 21**
+* **Spring Boot 3.x**
+    * Spring Data JPA (Persistência de dados e mapeamento ORM)
+    * Spring Web (Gerenciamento de rotas HTTP e MVC)
+    * Thymeleaf (Motor de renderização dinâmica para o Frontend)
+* **Lombok** (Produtividade e encapsulamento de código limpo)
+* **MySQL** (Banco de dados relacional)
+* **Bootstrap 5** (Estilização moderna e responsividade da interface visual)
+* **JUnit 5 & Mockito** (Testes unitários e isolamento de dependências)
+* **GitHub Actions** (Esteira de Integração Contínua - CI)
 
----
+## Arquitetura do Projeto
 
-## Tecnologias e Ferramentas Utilizadas
-* **Linguagem Principal:** Java 17+
-* **Framework:** Spring Boot (Spring Web, Spring Data JPA, Validation)
-* **Motor de Templates:** Thymeleaf (Renderização do lado do servidor)
-* **Estilização Visual:** Bootstrap 5 (via CDN)
-* **Banco de Dados:** MySQL
-* **Gerenciador de Dependências:** Maven
-* **Controle de Qualidade:** JUnit 5 e Mockito (Testes automatizados)
-* **CI/CD:** GitHub Actions (Pipeline automatizado)
+O sistema segue o padrão de arquitetura em camadas para garantir a separação de responsabilidades e facilidade de manutenção:
+* `model`: Mapeamento das entidades do banco de dados (`Tarefa`).
+* `repository`: Interfaces de comunicação direta e consultas ao banco via Spring Data JPA.
+* `service`: Camada central contendo as regras de negócio do sistema.
+* `controller`: Gerenciamento das requisições HTTP, rotas do Kanban e envio de dados para a View.
+* `templates`: Páginas HTML estruturadas dinamicamente com Thymeleaf (`kanban.html`).
 
----
+## Integração Contínua (CI)
 
-## Metodologia Adotada
-O desenvolvimento deste projeto foi estruturado utilizando **Metodologias Ágeis**, combinando conceitos do **Scrum** e do **Kanban**:
-* **Kanban:** Utilizado através da aba *Projects* do GitHub para gerenciar visualmente o fluxo das tarefas em tempo real, dividido estritamente entre as colunas **A Fazer**, **Em Progresso** e **Concluído**.
-* **Iteração Rápida:** Foco na entrega contínua de software funcional, garantindo que mudanças de escopo possam ser assimiladas e rastreadas sem impactar negativamente o cronograma geral.
+O projeto possui um pipeline de CI configurado via **GitHub Actions** (`.github/workflows/ci.yml`). A cada `push` ou `pull request` realizado nas ramificações principais, uma esteira automatizada em nuvem é disparada para:
+1. Provisionar um ambiente isolado com Ubuntu e JDK 21.
+2. Resolver e baixar as dependências do projeto através do Maven.
+3. Executar de forma limpa a suíte de testes automatizados (`mvn test`).
+
+## Testes Unitários
+
+A aplicação conta com testes unitários automatizados para garantir a robustez das regras de negócio na camada de serviço (`TarefaService`), utilizando o **Mockito** para simular o comportamento do repositório:
+* Teste de criação e salvamento de fluxos de trabalho com sucesso.
+* Teste de filtragem e listagem de demandas por status de coluna do Kanban.
+
+## Como Executar o Projeto
+
+1. Certifique-se de ter o **MySQL** rodando localmente no seu ambiente.
+2. Configure as credenciais do seu banco de dados no arquivo `src/main/resources/application.properties`.
+3. Abra o projeto em sua IDE (IntelliJ IDEA) e execute a classe principal `WorkflowManagerApplication`.
+4. Acesse o painel de logística no seu navegador através do endereço: `http://localhost:8080/tarefas`.
