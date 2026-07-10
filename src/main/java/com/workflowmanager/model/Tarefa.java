@@ -25,7 +25,7 @@ public class Tarefa {
     private String descricao;
 
     @Column(nullable = false)
-    private String status; // Ex: "A Fazer", "Em Progresso", "Concluído"
+    private String status = "A Fazer"; // Garante que toda tarefa comece na primeira coluna
 
     @Column(nullable = false)
     private String prioridade; // Ex: "Alta", "Média", "Baixa"
