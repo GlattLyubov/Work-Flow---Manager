@@ -23,11 +23,18 @@ public class TarefaController {
         return "kanban"; // Isso vai buscar um arquivo chamado kanban.html na pasta templates
     }
 
-    // Rota para salvar uma nova tarefa vinda do formulário
+    // Rota para salvar uma nova tarefa (Ajustada para aceitar parâmetros diretos)
     @PostMapping("/salvar")
-    public String salvarTarefa(@ModelAttribute("tarefa") Tarefa tarefa) {
+    public String salvarTarefa(@RequestParam("titulo") String titulo,
+                               @RequestParam("descricao") String descricao,
+                               @RequestParam("prioridade") String prioridade) {
+        Tarefa tarefa = new Tarefa();
+        tarefa.setTitulo(titulo);
+        tarefa.setDescricao(descricao);
+        tarefa.setPrioridade(prioridade);
+
         tarefaService.salvar(tarefa);
-        return "redirect:/tarefas"; // Recarrega a página atualizando a lista
+        return "redirect:/tarefas"; // Recarrega a página
     }
 
     // Rota para mudar o status da tarefa (mover os cartões no Kanban)
