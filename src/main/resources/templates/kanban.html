@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WorkFlow Manager - Kanban</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .kanban-board { display: flex; gap: 20px; padding: 20px; overflow-x: auto; }
+        .kanban-column { flex: 1; min-width: 300px; background-color: #ebecf0; border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .column-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: #333; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kanban-card { background-color: #fff; border-radius: 6px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); border-left: 5px solid #6c757d; }
+        .priority-Alta { border-left-color: #dc3545; }
+        .priority-Média { border-left-color: #ffc107; }
+        .priority-Baixa { border-left-color: #198754; }
+        .badge-priority { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; float: right; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <header class="bg-dark text-white p-3 mb-4 d-flex justify-content-between align-items-center rounded-bottom">
+        <h1 class="h3 m-0">📦 WorkFlow Manager</h1>
+        <span class="badge bg-secondary">Painel de Logística</span>
+    </header>
+
+    <div class="px-3 mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#novaTarefaModal">+ Nova Tarefa</button>
+    </div>
+
+    <div class="kanban-board">
+        <div class="kanban-column">
+            <div class="column-title text-secondary">📌 A Fazer</div>
+            <div th:each="tarefa : ${tarefasAFazer}" th:class="'kanban-card priority-' + ${tarefa.prioridade}">
+                <span th:text="${tarefa.prioridade}" th:class="'badge-priority text-white bg-' + (${tarefa.prioridade} == 'Alta' ? 'danger' : (${tarefa.prioridade} == 'Média' ? 'warning text-dark' : 'success'))"></span>
+                <h5 th:text="${tarefa.titulo}" class="card-title h6"></h5>
+                <p th:text="${tarefa.descricao}" class="text-muted small"></p>
+                <div class="d-flex justify-content-between mt-3">
+                    <form th:action="@{/tarefas/alterar-status/{id}(id=${tarefa.id})}" method="post">
+                        <input type="hidden" name="status" value="Em Progresso">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Iniciar ➡️</button>
+                    </form>
+                    <a th:href="@{/tarefas/deletar/{id}(id=${tarefa.id})}" class="btn btn-sm btn-link text-danger text-decoration-none">Excluir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="kanban-column">
+            <div class="column-title text-primary">⚡ Em Progresso</div>
+            <div th:each="tarefa : ${tarefasEmProgresso}" th:class="'kanban-card priority-' + ${tarefa.prioridade}">
+                <span th:text="${tarefa.prioridade}" th:class="'badge-priority text-white bg-' + (${tarefa.prioridade} == 'Alta' ? 'danger' : (${tarefa.prioridade} == 'Média' ? 'warning text-dark' : 'success'))"></span>
+                <h5 th:text="${tarefa.titulo}" class="card-title h6"></h5>
+                <p th:text="${tarefa.descricao}" class="text-muted small"></p>
+                <div class="d-flex justify-content-between mt-3">
+                    <form th:action="@{/tarefas/alterar-status/{id}(id=${tarefa.id})}" method="post">
+                        <input type="hidden" name="status" value="Concluído">
+                        <button type="submit" class="btn btn-sm btn-outline-success">Concluir ✅</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="kanban-column">
+            <div class="column-title text-success">✔️ Concluído</div>
+            <div th:each="tarefa : ${tarefasConcluidas}" th:class="'kanban-card priority-' + ${tarefa.prioridade}">
+                <span th:text="${tarefa.prioridade}" th:class="'badge-priority text-white bg-' + (${tarefa.prioridade} == 'Alta' ? 'danger' : (${tarefa.prioridade} == 'Média' ? 'warning text-dark' : 'success'))"></span>
+                <h5 th:text="${tarefa.titulo}" class="card-title h6"></h5>
+                <p th:text="${tarefa.descricao}" class="text-muted small"></p>
+                <div class="mt-3 text-end">
+                    <a th:href="@{/tarefas/deletar/{id}(id=${tarefa.id})}" class="btn btn-sm btn-outline-danger">Remover Histórico</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="novaTarefaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/tarefas/salvar}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cadastrar Fluxo de Trabalho</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título da Demanda</label>
+                        <input type="text" name="titulo" class="form-control" placeholder="Ex: Carga Docas Sul" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição / Observações</label>
+                        <textarea name="descricao" class="form-control" rows="3" placeholder="Detalhes do pedido ou rota..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prioridade</label>
+                        <select name="prioridade" class="form-select">
+                            <option value="Baixa">Baixa</option>
+                            <option value="Média">Média</option>
+                            <option value="Alta">Alta</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar ao Quadro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
